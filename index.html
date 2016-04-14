@@ -1,0 +1,241 @@
+<!-DOCTYPE HTML-->
+<html>
+<head>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" type="text/css"/>
+<link rel="stylesheet" href="css/jquery.mobile.theme-1.4.5.min.css" type="text/css"  />
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" type="text/css" />
+<script type="text/javascript" src="phonegap.js"></script>
+<script type="text/javascript" src="js/jquery-2.2.0.min.js" ></script>
+<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js" ></script>
+
+<script type="text/javascript">
+document.addEventListener("deviceready", onDeviceReady, false);
+
+function onDeviceReady(){
+   
+   $("#btnEnviar").tap(function env(){
+    alert("Funciona");
+    var nom=$("#txtnombre").val();
+    var aps=$("#txtApp").val();
+    var nc=$("#txtNControl").val();
+    var Edad=$("#txtEdad").val();
+    
+    if(nom=="" && aps=="" && nc=="" && Edad==""){
+        alert("Introduzca los datos requeridos en todos los datos");
+    }else{
+        //alert("Se enviaran los datos: Nombre: "+nom+"Apellidos: "+aps+"Numero de control: "+nc+"Edad: "+Edad);
+        $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/guardar.php",
+        data: "nomb="+nom+"&apps="+aps+"&numC="+nc+"&Ed="+Edad,
+        success: exitoso
+            });
+            function exitoso(datos){
+                alert("Respuesta: "+datos);
+            }
+    }
+});
+
+$("#btnConsultar").tap(function consul(){
+ //alert("Evento consultar");
+    $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/consultar.php",
+        data:"",
+        success:function(datos){
+            //alert("respuesta: "+datos);
+            var reg=$.parseJSON(datos);
+            var contenedor=$("#datos");
+            contenedor.html('<table border="1" id="tb1"><th>Id</\n\
+    th><th>Nombre</th><th>Apellidos</th><th>Numero_control</th><th>Edad</th>');
+            var fila=$("#tb1");
+            for(var i in reg){
+                fila.append('<tr><td>'+reg[i].Id+'</td><td>'+reg
+                [i].Nombre+'</td><td>'+reg[i].Apellidos+'</td><td>'+reg[i].Numero_control+'</\n\
+    td><td>'+reg[i].Edad+'</td></tr>'); 
+            }fila.append('</table>');
+        }
+    });
+});
+$("#btnBuscar").tap(function busq(){
+    var nombre=$("#busNombre").val();
+    $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/buscar.php",
+        data:"Nombre="+nombre,
+        success:function(datos){
+            var reg=$.parseJSON(datos);
+            var contenedor=$("#resBusqeda");
+            contenedor.html('<table border="1" id="tb2"><th>Id</\n\
+    th><th>Nombre</th><th>Apellidos</th><th>Numero_control</th><th>Edad</th>');
+            var fila=$("#tb2");
+            for(var i in reg){
+                fila.append('<tr><td>'+reg[i].Id+'</td><td>'+reg
+                [i].Nombre+'</td><td>'+reg[i].Apellidos+'</td><td>'+reg[i].Numero_control+'</\n\
+    td><td>'+reg[i].Edad+'</td></tr>'); 
+            }fila.append('</table>');
+        }
+    });
+});
+$("#btnBusqNC").tap(function busq(){
+    var nc=$("#txtNC").val();
+    $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/buscarNC.php",
+        data:"NC="+nc,
+        success:function(datos){
+            var reg=$.parseJSON(datos);
+            var contenedor=$("#resBusqeda2");
+            contenedor.html('<input type="text" id="txtModId" disabled="true" ><br>');
+            contenedor.append('<input type="text" id="txtModNombre" ><br>');
+            contenedor.append('<input type="text" id="txtModApellidos" ><br>');
+            contenedor.append('<input type="text" id="txtModNumNC" disabled="true"><br>');
+            contenedor.append('<input type="text" id="txtModEdad" ><br>'); 
+            
+            var IdMod=$("#txtModId");
+            IdMod.val(reg[0].Id);
+            var NombMod=$("#txtModNombre");
+            NombMod.val(reg[0].Nombre);
+            var ApsMod=$("#txtModApellidos");
+            ApsMod.val(reg[0].Apellidos);
+            var NCMod=$("#txtModNumNC");
+            NCMod.val(reg[0].Numero_control);
+            var EdadMod=$("#txtModEdad");
+            EdadMod.val(reg[0].Edad);
+        }
+    });
+});
+$("#btnActualizar").tap(function modif(){
+    var nombre=$("#txtModNombre").val();
+    var apell=$("#txtModApellidos").val();
+    var ed=$("#txtModEdad").val();
+    var nc=$("#txtModNumNC").val();
+    $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/Actualizar.php",
+        data:"Nombre="+nombre+"&App="+apell+"&Edad="+ed+"&NC="+nc,
+        success:function(datos){
+            alert("¡Actualizado! "+datos);
+        }
+    });
+    
+});
+
+$("#btnEliminar").tap(function modif(){
+    var nombre=$("#txtModNombre").val();
+    var apell=$("#txtModApellidos").val();
+    var ed=$("#txtModEdad").val();
+    var nc=$("#txtModNumNC").val();
+    $.ajax({
+        type:"POST",
+        url:"http://pruebasdb.260mb.net/Eliminar.php",
+        data:"Nombre="+nombre+"&App="+apell+"&Edad="+ed+"&NC="+nc,
+        success:function(datos){
+            alert("¡Eliminado! "+datos);
+        }
+    });
+    
+});
+
+}
+</script>
+<style type="text/css">
+#encabezado{
+text-align:center;
+font-size: 14px;
+color:red;
+font-weight:bold;
+}
+#pie{
+text-align:center;
+font-size:8px;
+color:green;
+font-weight:bold;
+}
+</style>
+</head>
+<body>
+    
+    <div data-role="page" id="principal">
+	<div data-role="header">
+		<h1>App</h1>
+	</div>
+	<div data-role="content">
+            
+    <a href="#Insertar"    data-role="button" data-trasnsition="flip">Registrar</a> 
+    <a href="Show.php"  data-role="button" data-trasnsition="flip">Consulta General con PHP</a>  
+       <a href="#Consultar"  data-role="button" data-trasnsition="flip">Consulta General con Ajax y JSON</a>  
+       <a href="#BuscarNombre" data-role="button" data-trasnsition="flip">Buscar por Nombre</a>
+       <a href="#ModNC" data-role="button" data-trasnsition="flip">Eliminar/Editar por Numero de Control</a>
+        </div>   
+	<div data-role="footer">
+            <!--<p>Pie de la aplicación</p>-->
+	</div>
+</div>   
+<div data-role="page" id="Insertar">
+	<div data-role="header">
+		<h1>Inserta tus Datos</h1>
+	</div>
+	<div data-role="content">
+            <form >
+                <input type="text" value="" placeholder="Escribe tu nombre" id="txtnombre"/>
+                <input type="text" value="" placeholder="Apellido" id="txtApp"/>
+                <input type="text" placeholder="Numero de control" id="txtNControl"/>
+                <input type="text" placeholder="Edad" id="txtEdad"/>
+                <input type="button" value="Registrar" id="btnEnviar"/>
+                </form>
+        </div>   
+	<div data-role="footer">
+            <p>Pie de la aplicación</p>
+  
+
+	</div>
+</div>
+    
+    <div data-role="page" id="Consultar">
+	<div data-role="header">
+		<h1>Consultar</h1>
+	</div>
+	<div data-role="content">
+                <input type="button" value="Consultar todo" id="btnConsultar"/>
+                <div id="datos"></div>
+                
+        </div>   
+	<div data-role="footer">
+            <p>Pie de la aplicación</p>
+  
+
+	</div>
+</div>
+    <div data-role="page" id="BuscarNombre">
+	<div data-role="header">
+		<h1>Busqueda por Nombre</h1>
+	</div>
+	<div data-role="content">
+                <input type="text" placeholder="Escribe tu nombre" id="busNombre"/>
+                <input type="button" value="Buscar" id="btnBuscar"/>
+                <div id="resBusqeda"></div>
+        </div>   
+	<div data-role="footer">
+            <p>Pie de la aplicación</p>
+	</div>
+</div>
+    <div data-role="page" id="ModNC">
+	<div data-role="header">
+		<h1>Edición/Eliminacion</h1>
+	</div>
+	<div data-role="content">
+                <input type="text" placeholder="Escribe tu numero de control" id="txtNC"/>
+                <input type="button" value="Buscar Datos" id="btnBusqNC"/>
+                <div id="resBusqeda2"></div>
+                <input type="button" value="Actualizar Datos" id="btnActualizar"/>
+                <input type="button" value="Eliminar#" id="btnEliminar"/>
+        </div>   
+	<div data-role="footer">
+            <p>Pie de la aplicación</p>
+	</div>
+</div>
+
+</body>
+</html>
+<!--metodo get bulnerable la informACION SE VISUALIZA ,post ES MAS SEGURO-->
